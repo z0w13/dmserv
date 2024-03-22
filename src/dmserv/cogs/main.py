@@ -36,12 +36,15 @@ class MainCog(commands.Cog):
     @tasks.loop(minutes=1)
     async def update(self):
         settings = GuildSettingsRepo(self.sess)
-        guild_ids = [g.id for g in self.bot.guilds]
+        guilds = {g.id: g for g in self.bot.guilds}
+        guild_ids = set(guilds.keys())
         guild_tokens = settings.get_multi(guild_ids, "token")
 
         for guild_id, token in guild_tokens.items():
             if not isinstance(token, str):
-                log.info(f"token for guild {guild_id} is not a string, skipping")
+                log.info(
+                    f"token for guild '{guilds[guild_id].name}' is not a string, skipping"
+                )
                 continue
 
             discord_guild = self.bot.get_guild(guild_id)
@@ -143,10 +146,10 @@ class MainCog(commands.Cog):
                     raise
 
         for role_name in create_roles:
-            log.info(f"creating role {role_name} in {ctx.guild.id}")
+            log.info(f"creating role '{role_name}' in '{ctx.guild.name}'")
             role = await ctx.guild.create_role(name=role_name)
             log.info(
-                f"assigning role role {role_name} ({role.id}) to {ctx.guild.owner.name} in {ctx.guild.id}"
+                f"assigning role '{role_name}' ({role.id}) to '@{ctx.guild.owner.name}' in '{ctx.guild.name}'"
             )
             await ctx.guild.owner.add_roles(role)
 
