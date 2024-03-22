@@ -147,7 +147,7 @@ class MainCog(commands.Cog):
 
         for role_name in create_roles:
             log.info(f"creating role '{role_name}' in '{ctx.guild.name}'")
-            role = await ctx.guild.create_role(name=role_name)
+            role = await ctx.guild.create_role(name=role_name, mentionable=True)
             log.info(
                 f"assigning role '{role_name}' ({role.id}) to '@{ctx.guild.owner.name}' in '{ctx.guild.name}'"
             )
