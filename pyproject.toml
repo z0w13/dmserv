@@ -1,7 +1,7 @@
 [project]
 name = "dmserv"
 version = "0.1.3"
-description = "Add your description here"
+description = "DM Server helper for systems that use PluralKit"
 authors = [
     { name = "Zowie", email = "git@zowie.cx" }
 ]
