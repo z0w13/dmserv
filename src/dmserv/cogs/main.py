@@ -1,5 +1,5 @@
 import logging
-from discord import PermissionOverwrite, Permissions
+from discord import PermissionOverwrite, Permissions, errors
 import pluralkit
 
 from discord.bot import Bot
@@ -130,8 +130,17 @@ class MainCog(commands.Cog):
         create_roles = desired_alter_roles - current_alter_roles
 
         for role_name in delete_roles:
-            log.info(f"deleting role {role_name} in {ctx.guild.id}")
-            await role_dict[role_name].delete()
+            log.info(f"deleting role '{role_name}' in '{ctx.guild.name}'")
+            try:
+                await role_dict[role_name].delete()
+            except errors.Forbidden as e:
+                if e.code == 50013:
+                    await ctx.respond(
+                        "Couldn't delete some roles, please make sure DMServ's role is listed above your alter roles"
+                    )
+                    break
+                else:
+                    raise
 
         for role_name in create_roles:
             log.info(f"creating role {role_name} in {ctx.guild.id}")
