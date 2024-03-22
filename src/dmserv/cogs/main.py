@@ -33,7 +33,7 @@ class MainCog(commands.Cog):
     async def on_ready(self):
         log.info(f"{self.bot.user} is ready and online!")
 
-    @tasks.loop(seconds=5)
+    @tasks.loop(minutes=1)
     async def update(self):
         settings = GuildSettingsRepo(self.sess)
         guild_ids = [g.id for g in self.bot.guilds]
