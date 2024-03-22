@@ -116,7 +116,9 @@ class MainCog(commands.Cog):
 
         pk = pluralkit.Client(token=token)
 
-        role_dict = {r.name: r for r in ctx.guild.roles if r.name.endswith(" (Alter)")}
+        role_dict = {
+            r.name: r for r in ctx.guild.roles if r.name.lower().endswith(" (alter)")
+        }
 
         desired_alter_roles = {n + " (Alter)" for n in await get_display_names(pk)}
         current_alter_roles = set(role_dict.keys())
