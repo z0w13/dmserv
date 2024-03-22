@@ -120,7 +120,10 @@ class MainCog(commands.Cog):
             r.name: r for r in ctx.guild.roles if r.name.lower().endswith(" (alter)")
         }
 
-        desired_alter_roles = {n + " (Alter)" for n in await get_display_names(pk)}
+        # TODO: Don't do basic bitch splitting to remove pronouns but something more robust
+        desired_alter_roles = {
+            n.split("(")[0] + " (Alter)" for n in await get_display_names(pk)
+        }
         current_alter_roles = set(role_dict.keys())
 
         delete_roles = current_alter_roles - desired_alter_roles
