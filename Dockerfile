@@ -1,7 +1,7 @@
-FROM debian
+FROM python:3.12.1-slim AS build
 
 RUN apt-get update -y \
- && apt install -y curl \
+ && apt-get install -y curl \
  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
@@ -9,6 +9,11 @@ RUN curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
 COPY . /app
 WORKDIR /app
 
-RUN /root/.rye/shims/rye sync
+RUN /root/.rye/shims/rye build --wheel --clean
 
-CMD ["/root/.rye/shims/rye", "run", "dmserv", "bot"]
+FROM python:3.12.1-slim
+
+COPY --from=build /app/dist/*.whl /tmp/
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir /tmp/*.whl
+
+CMD ["dmserv", "bot"]
