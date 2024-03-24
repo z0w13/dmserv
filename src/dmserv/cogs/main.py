@@ -1,5 +1,5 @@
 import logging
-from discord import PermissionOverwrite, Permissions, errors
+from discord import PermissionOverwrite, errors
 import pluralkit
 
 from discord.bot import Bot
