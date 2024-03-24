@@ -1,11 +1,10 @@
 import logging
-from discord import PermissionOverwrite, errors
+from discord import errors
 import pluralkit
 
 from discord.bot import Bot
 from discord.ext import commands
 from discord.ext import bridge
-from discord.ext import tasks
 from sqlalchemy.orm import Session, sessionmaker
 
 from dmserv.db.models import GuildSettingsRepo
@@ -22,71 +21,10 @@ class MainCog(commands.Cog):
     def __init__(self, bot: Bot, sess: sessionmaker[Session]):
         self.bot = bot
         self.sess = sess
-        self.update.start()
-
-    def cog_unload(self):
-        self.update.cancel()
 
     @commands.Cog.listener()
     async def on_ready(self):
         log.info(f"{self.bot.user} is ready and online!")
-
-    @tasks.loop(minutes=1)
-    async def update(self):
-        settings = GuildSettingsRepo(self.sess)
-        guilds = {g.id: g for g in self.bot.guilds}
-        guild_ids = set(guilds.keys())
-        guild_tokens = settings.get_multi(guild_ids, "token")
-
-        for guild_id, token in guild_tokens.items():
-            if not isinstance(token, str):
-                log.info(
-                    f"token for guild '{guilds[guild_id].name}' is not a string, skipping"
-                )
-                continue
-
-            discord_guild = self.bot.get_guild(guild_id)
-            if discord_guild is None:
-                log.info(f"guild {guild_id} not found, skipping")
-                continue
-
-            fronter_cat = None
-            for cat in discord_guild.categories:
-                if cat.name == "Current Fronters":
-                    fronter_cat = cat
-                    break
-
-            if fronter_cat is None:
-                log.info(
-                    f"guild {guild_id} has no category for current fronters, skipping"
-                )
-                continue
-
-            pk = pluralkit.Client(token=token)
-            fronters = pk.get_fronters()
-            names: set[str] = {fronter.name.lower() async for fronter in fronters}
-            discord_names = {chan.name.lower() for chan in fronter_cat.channels}
-
-            delete_names = discord_names - names
-            create_names = names - discord_names
-
-            for name in delete_names:
-                for chan in fronter_cat.channels:
-                    if chan.name == name:
-                        log.debug(
-                            f"deleting channel {chan.name} ({chan.id}) in guild {guild_id}"
-                        )
-                        await chan.delete()
-
-            for name in create_names:
-                log.debug(f"creating channel {name} in guild {guild_id}")
-                await discord_guild.create_voice_channel(
-                    name=name,
-                    category=fronter_cat,
-                    overwrites={
-                        discord_guild.default_role: PermissionOverwrite(connect=False)
-                    },
-                )
 
     @bridge.bridge_command(name="update-alter-roles")
     @bridge.guild_only()
