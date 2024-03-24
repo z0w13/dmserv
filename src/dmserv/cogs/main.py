@@ -11,13 +11,11 @@ from sqlalchemy.orm import Session, sessionmaker
 from dmserv.db.models import GuildSettingsRepo
 
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
-async def get_display_names(pk: pluralkit.Client) -> set[str]:
-    return {
-        member.display_name if member.display_name is not None else member.name
-        async for member in pk.get_members()
-    }
+async def get_display_names(pk: pluralkit.Client) -> list[str]:
+    return [member.display_name or member.name async for member in pk.get_members()]
 
 
 class MainCog(commands.Cog):
