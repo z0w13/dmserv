@@ -1,9 +1,9 @@
 import argparse
 import os
 import discord
-import sqlalchemy
 
 from discord.ext.bridge import AutoShardedBot
+from sqlalchemy.orm import Session, sessionmaker
 from dmserv.cogs.FronterList import FronterListCog
 from dmserv.cogs.main import MainCog
 
@@ -12,7 +12,7 @@ def register_bot_subcommand(parser: argparse.ArgumentParser):
     parser.set_defaults(func=main)
 
 
-def main(args: argparse.Namespace, engine: sqlalchemy.Engine) -> int:
+def main(args: argparse.Namespace, engine: sessionmaker[Session]) -> int:
     bot = AutoShardedBot(
         intents=discord.Intents.all(),
         command_prefix="dm!",

@@ -1,10 +1,8 @@
 import logging
-from discord import errors
 import pluralkit
 
-from discord.bot import Bot
-from discord.ext import commands
-from discord.ext import bridge
+from discord import errors
+from discord.ext import bridge, commands
 from sqlalchemy.orm import Session, sessionmaker
 
 from dmserv.db.models import GuildSettingsRepo
@@ -18,7 +16,7 @@ async def get_display_names(pk: pluralkit.Client) -> list[str]:
 
 
 class MainCog(commands.Cog):
-    def __init__(self, bot: Bot, sess: sessionmaker[Session]):
+    def __init__(self, bot: bridge.AutoShardedBot, sess: sessionmaker[Session]):
         self.bot = bot
         self.sess = sess
 

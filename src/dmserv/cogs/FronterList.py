@@ -1,10 +1,8 @@
 import logging
-from discord import CategoryChannel, Guild, PermissionOverwrite
 import pluralkit
 
-from discord.bot import Bot
-from discord.ext import commands
-from discord.ext import tasks
+from discord import CategoryChannel, Guild, PermissionOverwrite
+from discord.ext import commands, tasks, bridge
 from sqlalchemy.orm import Session, sessionmaker
 
 from dmserv.db.models import GuildSettingsRepo
@@ -14,7 +12,7 @@ log.setLevel(logging.DEBUG)
 
 
 class FronterListCog(commands.Cog):
-    def __init__(self, bot: Bot, sess: sessionmaker[Session]):
+    def __init__(self, bot: bridge.AutoShardedBot, sess: sessionmaker[Session]):
         self.bot = bot
         self.sess = sess
         self.update.start()
