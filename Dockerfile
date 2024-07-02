@@ -4,7 +4,7 @@ RUN apt-get update -y \
  && apt-get install -y curl \
  && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+RUN curl -sSLf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
 
 COPY . /app
 WORKDIR /app
