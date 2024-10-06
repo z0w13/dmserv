@@ -94,4 +94,8 @@ class FronterListCog(commands.Cog):
                 log.info(f"token for guild '{guild.name}' is not a string, skipping")
                 return
 
-            await self.update_guild(guild, token)
+            try:
+                await self.update_guild(guild, token)
+            except Exception as e:
+                log.exception(f"Exception updating {guild.name}", exc_info=e)
+                continue
